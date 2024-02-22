@@ -10,6 +10,10 @@ github.com/fogfish/hnsw v0.0.0-20240206202813-138966e55d58/go.mod h1:VvUz42T5SDT
 github.com/fogfish/it v1.0.0 h1:kiwFHZcrkRLUydZoIoY0gTuMfj38trwvLo0YRyIkeG8=
 github.com/fogfish/it/v2 v2.0.1 h1:vu3kV2xzYDPHoMHMABxXeu5CoMcTfRc4gkWkzOUkRJY=
 github.com/fogfish/it/v2 v2.0.1/go.mod h1:h5FdKaEQT4sUEykiVkB8VV4jX27XabFVeWhoDZaRZtE=
+github.com/fogfish/word2vec v0.0.0-20240222201857-2ad2b3dd3ae0 h1:2n4AbTeJvDuxl4zSfLumxkV8tgOHtk4rvmCrmP0qHlM=
+github.com/fogfish/word2vec v0.0.0-20240222201857-2ad2b3dd3ae0/go.mod h1:bTVg8hy/jLRSV4sxReQwYOCuprLyn2R4FGVWRxn2KCY=
+github.com/fogfish/word2vec/trainer v0.0.0-20240222201857-2ad2b3dd3ae0 h1:7hwx87iXtUW9KrPEwDpJIsOfqGBQ1VeZh8qyMRysDq8=
+github.com/fogfish/word2vec/trainer v0.0.0-20240222201857-2ad2b3dd3ae0/go.mod h1:U1G48QYgD00gTtSLOpDLC/WFjDVA6vUNBHUlwxDyV/A=
 github.com/frankban/quicktest v1.14.6 h1:7Xjx+VpznH+oBnejlPUj8oUpdxnVs4f8XU8WnHkI4W8=
 github.com/frankban/quicktest v1.14.6/go.mod h1:4ptaffx2x8+WTWXmUCuVU6aPUX1/Mz7zb5vbUoiM6w0=
 github.com/fsnotify/fsnotify v1.7.0 h1:8JEhPFa5W2WU7YfeZzPNqzMP6Lwt7L2715Ggo0nosvA=

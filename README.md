@@ -1,7 +1,7 @@
 <p align="center">
-  <img src="./doc/word2vec.png" height="120" />
+  <img src="./doc/word2vec.png" height="240" />
   <h3 align="center">word2vec</h3>
-  <p align="center"><strong>Golang "native" implementation of word2vec algorithm (port of word2vec++)</strong></p>
+  <p align="center"><strong>Golang "native" implementation of word2vec algorithm (word2vec++ port)</strong></p>
 
   <p align="center">
     <!-- Version -->
@@ -43,6 +43,7 @@ Use C++11 compatible compiler and cmake 3.1 to build the library. It is essentia
 
 ```bash
 mkdir _build && cd _build
+brew install cmake
 cmake -DCMAKE_BUILD_TYPE=Release ../libw2v
 make
 cp ../libw2v/lib/libw2v.dylib /usr/local/lib/libw2v.dylib
