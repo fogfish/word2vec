@@ -2,8 +2,6 @@ module github.com/fogfish/word2vec/w2v
 
 go 1.21.3
 
-replace github.com/fogfish/word2vec => ../
-
 require (
 	github.com/fogfish/hnsw v0.0.0-20240206202813-138966e55d58
 	github.com/fogfish/word2vec v0.0.0-20240222201857-2ad2b3dd3ae0
