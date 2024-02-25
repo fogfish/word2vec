@@ -18,237 +18,180 @@ import "C"
 import (
 	"fmt"
 	"unsafe"
-
-	"github.com/spf13/viper"
 )
 
 type ConfigCorpus struct {
 	// filename of a train text corpus
-	dataset string
+	Dataset string
 
 	// filename of the stop-words set [optional]
-	stopwords string
+	StopWords string
 
 	// word tokenizer
-	tokenizer string
+	Tokenizer string
 
 	// sequence tokenizer
-	sequencer string
-}
-
-func NewCorpusFromConfig() ConfigCorpus {
-	tokenizer := viper.GetString("corpus.tokenizer")
-	fmt.Printf("%x", []byte(tokenizer))
-	if tokenizer == "" {
-		tokenizer = " \n,.-!?:;/\"#$%&'()*+<=>@[]\\^_`{|}~\t\v\f\r"
-	}
-
-	sequencer := viper.GetString("corpus.sequencer")
-	if sequencer == "" {
-		sequencer = ".\n?!"
-	}
-
-	return ConfigCorpus{
-		stopwords: viper.GetString("corpus.stopwords"),
-		tokenizer: tokenizer,
-		sequencer: sequencer,
-	}
+	Sequencer string
 }
 
 func NewCorpusDefault() ConfigCorpus {
 	return ConfigCorpus{
-		tokenizer: " \n,.-!?:;/\"#$%&'()*+<=>@[]\\^_`{|}~\t\v\f\r",
-		sequencer: ".\n?!",
+		Tokenizer: " \n,.-!?:;/\"#$%&'()*+<=>@[]\\^_`{|}~\t\v\f\r",
+		Sequencer: ".\n?!",
 	}
 }
 
 type ConfigWordVector struct {
 	// words vector dimension
-	vector int
+	Vector int
 
 	// nearby words frame or window
-	window int
+	Window int
 
 	// threshold for occurrence of words
-	threshold float64
+	Threshold float64
 
 	// exclude words that appear less than [value] times from vocabulary
-	frequency int
-}
-
-func NewWordVectorFromConfig() ConfigWordVector {
-	vector := viper.GetInt("word.vector")
-	if vector == 0 {
-		vector = 300
-	}
-
-	window := viper.GetInt("word.window")
-	if window == 0 {
-		window = 5
-	}
-
-	return ConfigWordVector{
-		vector:    vector,
-		window:    window,
-		threshold: viper.GetFloat64("word.threshold"),
-		frequency: viper.GetInt("word.frequency"),
-	}
+	Frequency int
 }
 
 func NewWordVectorDefault() ConfigWordVector {
 	return ConfigWordVector{
-		vector:    300,
-		window:    5,
-		threshold: 1e-3,
-		frequency: 5,
+		Vector:    300,
+		Window:    5,
+		Threshold: 1e-3,
+		Frequency: 5,
 	}
 }
 
 type ConfigLearning struct {
 	// number of training iterations, epoch
-	epoch int
+	Epoch int
 
 	// starting learning rate
-	rate float64
-}
-
-func NewLearningFromConfig() ConfigLearning {
-	return ConfigLearning{
-		epoch: viper.GetInt("learning.epoch"),
-		rate:  viper.GetFloat64("learning.rate"),
-	}
+	Rate float64
 }
 
 func NewLearningDefault() ConfigLearning {
 	return ConfigLearning{
-		epoch: 5,
-		rate:  0.05,
+		Epoch: 5,
+		Rate:  0.05,
 	}
 }
 
-type Trainer struct {
-	output   string
-	corpus   ConfigCorpus
-	vector   ConfigWordVector
-	learning ConfigLearning
+type Config struct {
+	Corpus   ConfigCorpus
+	Vector   ConfigWordVector
+	Learning ConfigLearning
 
 	// choose of the learning model:
 	//  - Continuous Bag of Words (CBOW)
 	//  - Skip-Gram
-	useSkipGram bool
-	useCBOW     bool
+	UseSkipGram bool
+	UseCBOW     bool
 
 	// the computationally efficient approximation
 	//  - Negative Sampling (NS)
 	//  - Hierarchical Softmax (HS)
-	useNegativeSampling    bool
-	useHierarchicalSoftMax bool
+	UseNegativeSampling    bool
+	UseHierarchicalSoftMax bool
 
 	// number of negative examples (NS option)
-	sizeNegativeSampling int
+	SizeNegativeSampling int
 
-	threads int
-	verbose bool
-
-	h unsafe.Pointer
+	Output  string
+	Threads int
+	Verbose bool
 }
 
-type Option func(*Trainer)
+func NewConfigDefault() Config {
+	return Config{
+		Corpus:      NewCorpusDefault(),
+		Vector:      NewWordVectorDefault(),
+		Learning:    NewLearningDefault(),
+		UseSkipGram: true,
+		UseCBOW:     false,
 
-func WithDefault() Option {
-	return func(t *Trainer) {
-		t.corpus = NewCorpusDefault()
-		t.vector = NewWordVectorDefault()
-		t.learning = NewLearningDefault()
+		UseNegativeSampling:    true,
+		UseHierarchicalSoftMax: false,
+		SizeNegativeSampling:   5,
 
-		t.useSkipGram = true
-		t.useCBOW = false
-
-		t.useNegativeSampling = true
-		t.useHierarchicalSoftMax = false
-		t.sizeNegativeSampling = 5
-
-		t.threads = 12
-		t.verbose = true
+		Threads: 12,
+		Verbose: true,
 	}
 }
 
-func WithConfigFile() Option {
-	return func(t *Trainer) {
-		t.corpus = NewCorpusFromConfig()
-		t.vector = NewWordVectorFromConfig()
-		t.learning = NewLearningFromConfig()
-
-		t.useSkipGram = viper.GetBool("skip-gram.enabled")
-		t.useCBOW = viper.GetBool("cbow.enabled")
-
-		t.useNegativeSampling = viper.GetBool("negative-sampling.enabled")
-		t.sizeNegativeSampling = viper.GetInt("negative-sampling.size")
-		t.useHierarchicalSoftMax = viper.GetBool("hierarchical-softmax.enabled")
-	}
+type Trainer struct {
+	config Config
+	h      unsafe.Pointer
 }
 
-func WithCorpusDataset(dataset string) Option {
-	return func(t *Trainer) {
-		t.corpus.dataset = dataset
-	}
-}
+// type Option func(*ConfigTrainer)
 
-func WithOutput(output string) Option {
-	return func(t *Trainer) {
-		t.output = output
-	}
-}
+// func WithDefault() Option {
+// 	return func(t *ConfigTrainer) {
+// 		t.config = NewTrainerDefault()
+// 	}
+// }
 
-func WithVerbose(verbose bool) Option {
-	return func(t *Trainer) {
-		t.verbose = verbose
-	}
-}
+// func WithCorpusDataset(dataset string) Option {
+// 	return func(t *Trainer) {
+// 		t.corpus.dataset = dataset
+// 	}
+// }
 
-func WithThreads(threads int) Option {
-	return func(t *Trainer) {
-		t.threads = threads
-	}
-}
+// func WithOutput(output string) Option {
+// 	return func(t *Trainer) {
+// 		t.output = output
+// 	}
+// }
+
+// func WithVerbose(verbose bool) Option {
+// 	return func(t *Trainer) {
+// 		t.verbose = verbose
+// 	}
+// }
+
+// func WithThreads(threads int) Option {
+// 	return func(t *Trainer) {
+// 		t.threads = threads
+// 	}
+// }
 
 //
 //
 
-func Train(opts ...Option) error {
+func Train(config Config) error {
 	var w2v Trainer
-	WithDefault()(&w2v)
-	for _, opt := range opts {
-		opt(&w2v)
-	}
+	w2v.config = config
 
-	dataset := C.CString(w2v.corpus.dataset)
+	dataset := C.CString(w2v.config.Corpus.Dataset)
 	defer C.free(unsafe.Pointer(dataset))
 
-	fileStopWords := C.CString(w2v.corpus.stopwords)
+	fileStopWords := C.CString(w2v.config.Corpus.StopWords)
 	defer C.free(unsafe.Pointer(fileStopWords))
 
-	fileModel := C.CString(w2v.output)
+	fileModel := C.CString(w2v.config.Output)
 	defer C.free(unsafe.Pointer(fileModel))
 
 	withHS := C.uchar(0)
-	if w2v.useHierarchicalSoftMax {
+	if w2v.config.UseHierarchicalSoftMax {
 		withHS = C.uchar(1)
 	}
 
 	withSG := C.uchar(0)
-	if w2v.useSkipGram {
+	if w2v.config.UseSkipGram {
 		withSG = C.uchar(1)
 	}
 
-	tokenizer := C.CString(w2v.corpus.tokenizer)
+	tokenizer := C.CString(w2v.config.Corpus.Tokenizer)
 	defer C.free(unsafe.Pointer(tokenizer))
 
-	sequencer := C.CString(w2v.corpus.sequencer)
+	sequencer := C.CString(w2v.config.Corpus.Sequencer)
 	defer C.free(unsafe.Pointer(sequencer))
 
 	verbose := C.uchar(0)
-	if w2v.verbose {
+	if w2v.config.Verbose {
 		verbose = C.uchar(1)
 	}
 
@@ -256,15 +199,15 @@ func Train(opts ...Option) error {
 		dataset,
 		fileStopWords,
 		fileModel,
-		C.ushort(w2v.vector.frequency),
-		C.ushort(w2v.vector.vector),
-		C.uchar(w2v.vector.window),
-		C.float(w2v.vector.threshold),
+		C.ushort(w2v.config.Vector.Frequency),
+		C.ushort(w2v.config.Vector.Vector),
+		C.uchar(w2v.config.Vector.Window),
+		C.float(w2v.config.Vector.Threshold),
 		withHS,
-		C.uint8_t(w2v.sizeNegativeSampling),
-		C.uint8_t(12),
-		C.uint8_t(w2v.learning.epoch),
-		C.float(w2v.learning.rate),
+		C.uint8_t(w2v.config.SizeNegativeSampling),
+		C.uint8_t(w2v.config.Threads),
+		C.uint8_t(w2v.config.Learning.Epoch),
+		C.float(w2v.config.Learning.Rate),
 		withSG,
 		tokenizer,
 		sequencer,

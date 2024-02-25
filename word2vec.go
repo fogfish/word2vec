@@ -21,23 +21,7 @@ import (
 	"unsafe"
 )
 
-type Option func(*Model)
-
-// Configure model
-func WithModel(model string) Option {
-	return func(c *Model) {
-		c.fileModel = model
-	}
-}
-
-// Configure vector size
-func WithVectosSize(n int) Option {
-	return func(c *Model) {
-		c.vectorSize = n
-	}
-}
-
-// Model
+// word2vec model
 type Model struct {
 	fileModel  string
 	vectorSize int
@@ -46,13 +30,11 @@ type Model struct {
 }
 
 // Loads pre-trained model
-// The name of model file must be in the format
-// <model_name>_<data_version>_<metric>_<value>
-func Load(opts ...Option) (w2v Model, err error) {
+func Load(model string, vector int) (w2v Model, err error) {
+	w2v.fileModel = model
 	w2v.vectorSize = 300
-
-	for _, opt := range opts {
-		opt(&w2v)
+	if vector != 0 {
+		w2v.vectorSize = vector
 	}
 
 	name := C.CString(w2v.fileModel)
@@ -87,12 +69,6 @@ func (w2v Model) VectorOf(word string, vector []float32) error {
 	C.free(unsafe.Pointer(ptr))
 
 	return nil
-
-	// vector := make([]float32, w2v.vectorSize)
-
-	// h := (*C.float)(unsafe.Pointer(unsafe.SliceData(vector)))
-	// C.VectorOf(w2v.h, cword, h)
-	// return vector
 }
 
 // Calculates embedding for document

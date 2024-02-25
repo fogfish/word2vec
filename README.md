@@ -55,8 +55,8 @@ cp ../libw2v/lib/libw2v.dylib /usr/local/lib/libw2v.dylib
 
 The trained model is required before moving on. Either use original Max Fomichev's [word2vec C++ utility](https://github.com/maxoodf/word2vec) or Golang's frond-end supplied by this project:
 
-```
-go install github.com/fogfish/word2vec/cmd@latest
+```bash
+go install github.com/fogfish/word2vec/w2v@latest
 ```
 
 In following examples, ["War and Peace" by Leo Tolstoy](./doc/leo-tolstoy-war-and-peace-en.txt) is used for training. We have also used [stop words](https://github.com/stopwords-iso/stopwords-en) to increase accuracy.
@@ -64,10 +64,10 @@ In following examples, ["War and Peace" by Leo Tolstoy](./doc/leo-tolstoy-war-an
 Let's start training with defining the config file:
 
 ```
-cmd train config > wap-en.yaml
+w2v train config > wap-en.yaml
 
-cmd train -C wap-en.yaml \
-  -o wap-v300w5e10s1h010-en.bin \
+w2v train -C wap-en.yaml \
+  -o wap-v300w5e5s1h005-en.bin \
   -f ../doc/leo-tolstoy-war-and-peace-en.txt
 ```
 
@@ -92,10 +92,7 @@ The example below shows the usage patterns for the library
 import "github.com/fogfish/word2vec"
 
 // 1. Load model
-w2v, err := word2vec.Load(
-	word2vec.WithModel("wap-v300w5e10s1h010-en.bin"),
-	word2vec.WithVectosSize(300),
-)
+w2v, err := word2vec.Load("wap-v300w5e10s1h010-en.bin", 300)
 
 seq := make([]word2vec.Nearest, 30)
 w2v.Lookup("alexander", seq)
@@ -104,8 +101,8 @@ w2v.Lookup("alexander", seq)
 See [the example](./cmd/opts/lookup.go) or try it our via command line
 
 ```bash
-cmd lookup \
-  -m wap-v300w5e10s1h010-en.bin \
+w2v lookup \
+  -m wap-v300w5e5s1h005-en.bin \
   -k 30 \
   alexander
 ```
@@ -119,24 +116,21 @@ Calculate embedding for document
 import "github.com/fogfish/word2vec"
 
 // 1. Load model
-w2v, err := word2vec.Load(
-	word2vec.WithModel("wap-v300w5e10s1h010-en.bin"),
-	word2vec.WithVectosSize(300),
-)
+w2v, err := word2vec.Load("wap-v300w5e10s1h010-en.bin", 300)
 
 // 2. Allocated the memory for vector
 vec := make([]float32, 300)
 
 // 3. Calculate embeddings for the document
 doc := "braunau was the headquarters of the commander-in-chief"
-err = w2v.Embedding(, vec)
+err = w2v.Embedding(doc, vec)
 ```
 
 See [the example](./cmd/opts/embedding.go) or try it our via command line
 
 ``` bash
-cmd embedding \
-  -m wap-v300w5e10s1h010-en.bin \
+w2v embedding \
+  -m wap-v300w5e5s1h005-en.bin \
   ../doc/leo-tolstoy-war-and-peace-en.txt
 ```
 

@@ -8,7 +8,7 @@
 
 package main
 
-import "github.com/fogfish/word2vec/cmd/opts"
+import "github.com/fogfish/word2vec/w2v/opts"
 
 func main() {
 	opts.Execute()

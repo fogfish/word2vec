@@ -27,8 +27,9 @@ func Execute() {
 
 var rootCmd = &cobra.Command{
 	Use:   "w2v",
-	Short: "",
+	Short: "CLI for word2vec model training and execution of simple use-cases.",
 	Long: `
+CLI for word2vec model training and execution of simple use-cases.
 	`,
 	Run: root,
 }

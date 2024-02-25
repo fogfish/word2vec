@@ -1,12 +1,23 @@
-module github.com/fogfish/word2vec/trainer
+module github.com/fogfish/word2vec/w2v
 
 go 1.21.3
 
-require github.com/spf13/viper v1.18.2
+replace github.com/fogfish/word2vec => ../
 
 require (
+	github.com/fogfish/hnsw v0.0.0-20240206202813-138966e55d58
+	github.com/fogfish/word2vec v0.0.0-20240222201857-2ad2b3dd3ae0
+	github.com/fogfish/word2vec/trainer v0.0.0-20240222201857-2ad2b3dd3ae0
+	github.com/kshard/fvecs v0.0.1
+	github.com/spf13/cobra v1.8.0
+	github.com/spf13/viper v1.18.2
+)
+
+require (
+	github.com/fogfish/golem/pure v0.10.1 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
+	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect

@@ -40,8 +40,24 @@ var (
 
 var trainCmd = &cobra.Command{
 	Use:   "train",
-	Short: "train the model",
+	Short: "train word2vec model",
 	Long: `
+Train word2vec model from own corpus. The training process requires:
+* text corpus on target language
+* stop words, obtain from https://github.com/stopwords-iso
+
+Configure training process through config file:
+
+  w2v train config > wap-en.yaml
+
+The default params gives sufficient results but feel free to tune them.
+
+Consider naming of the model after parameters used for training:
+* "v" vector size
+* "w" nearby words window 
+* "e" training epoch
+* architecture skip-gram "s1" or CBoW "s0"
+* algorithm H. softmax "h1", N. Sampling "h0"
 	`,
 	Example: `
 cmd train -C wap-en.yaml \
@@ -56,13 +72,13 @@ func train(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	err := trainer.Train(
-		trainer.WithConfigFile(),
-		trainer.WithCorpusDataset(trainCorpus),
-		trainer.WithOutput(trainOutput),
-		trainer.WithThreads(trainThreads),
-		trainer.WithVerbose(!trainSilent),
-	)
+	cfg := NewConfig()
+	cfg.Corpus.Dataset = trainCorpus
+	cfg.Output = trainOutput
+	cfg.Threads = trainThreads
+	cfg.Verbose = !trainSilent
+
+	err := trainer.Train(cfg)
 	if err != nil {
 		return err
 	}
@@ -76,8 +92,9 @@ func train(cmd *cobra.Command, args []string) error {
 
 var configCmd = &cobra.Command{
 	Use:   "config",
-	Short: "xxx",
+	Short: "Generate config file with default params for training",
 	Long: `
+Generate config file with default params for training
 	`,
 	RunE: configFile,
 }

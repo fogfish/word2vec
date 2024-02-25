@@ -36,11 +36,16 @@ var (
 
 var embeddingCmd = &cobra.Command{
 	Use:   "embedding",
-	Short: "calculate embedding for input text",
+	Short: "Calculate embedding for input text",
 	Long: `
+Calculates embedding for input text. 
+
+For each paragraph (split by \n) from input text, it calculates embeddings vector.
+Vectors are written to .fvecs file next to input text. The text used for
+the assessment of embeddings is written to .bvecs file. 
 	`,
 	Example: `
-	w2v embedding -m wap-v300w5e10s1h010-en.bin doc/leo-tolstoy-war-and-peace-en.txt
+  w2v embedding -m wap-v300w5e10s1h010-en.bin doc/leo-tolstoy-war-and-peace-en.txt
 	`,
 	RunE: embedding,
 	Args: cobra.MinimumNArgs(1),
@@ -52,10 +57,7 @@ type Node struct {
 }
 
 func embedding(cmd *cobra.Command, args []string) error {
-	w2v, err := word2vec.Load(
-		word2vec.WithModel(embeddingModel),
-		word2vec.WithVectosSize(embeddingVecSize),
-	)
+	w2v, err := word2vec.Load(embeddingModel, embeddingVecSize)
 	if err != nil {
 		return err
 	}
@@ -94,33 +96,43 @@ func embeddingText(w2v word2vec.Model, text string) error {
 	defer fd.Close()
 
 	t := time.Now()
-	cnt := 0
+	cnt := 1
+	vol := 0
 	vec := make([]float32, embeddingVecSize)
 
 	scanner := bufio.NewScanner(fd)
+	scanner.Buffer(make([]byte, 1024*1024), 1024*1024)
 	for scanner.Scan() {
-		t := strings.Trim(
+		txt := strings.Trim(
 			scanner.Text(),
 			" \n,.-!?:;/\"#$%&'()*+<=>@[]\\^_`{|}~\t\v\f\r",
 		)
 
-		if len(t) == 0 {
+		if len(txt) == 0 {
 			continue
 		}
 
-		if err := w2v.Embedding(t, vec); err != nil {
+		if err := w2v.Embedding(txt, vec); err != nil {
 			slog.Warn("skip", "text", t)
 			continue
 		}
 
+		cnt++
+		vol += len(txt)
+
+		// if cnt%1000000 == 0 {
+		// 	os.Stderr.WriteString(
+		// 		fmt.Sprintf("%v\t%d\t%d\t%d\t%d\n", time.Since(t), cnt, vol, int(time.Since(t).Nanoseconds())/cnt, vol/cnt),
+		// 	)
+		// }
+
 		if err := fw.Write(vec); err != nil {
 			return err
 		}
-		if err := bw.Write([]byte(t)); err != nil {
+		if err := bw.Write([]byte(txt)); err != nil {
 			return err
 		}
 
-		cnt++
 	}
 
 	if err := scanner.Err(); err != nil {

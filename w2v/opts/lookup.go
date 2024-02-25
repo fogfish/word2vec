@@ -31,20 +31,20 @@ var (
 
 var lookupCmd = &cobra.Command{
 	Use:   "lookup",
-	Short: "lookup nearest word to query",
+	Short: "Query (Lookup) word2vec model for neighbor tokens (words).",
 	Long: `
+Query (Lookup) word2vec model for neighbor tokens (words).
 	`,
 	Example: `
-	w2v lookup -m wap-v300w5e10s1h010-en.bin aleksander
+  w2v lookup -m wap-v300w5e5s1h005-en.bin alexander
+  w2v lookup -m wap-v300w5e5s1h005-en.bin emperor
 	`,
 	RunE: lookup,
+	Args: cobra.MinimumNArgs(1),
 }
 
 func lookup(cmd *cobra.Command, args []string) error {
-	w2v, err := word2vec.Load(
-		word2vec.WithModel(lookupModel),
-		word2vec.WithVectosSize(embeddingVecSize),
-	)
+	w2v, err := word2vec.Load(lookupModel, embeddingVecSize)
 	if err != nil {
 		return err
 	}
