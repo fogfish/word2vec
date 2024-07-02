@@ -4,8 +4,7 @@ go 1.21.3
 
 require (
 	github.com/fogfish/hnsw v0.0.0-20240206202813-138966e55d58
-	github.com/fogfish/word2vec v0.0.0-20240222201857-2ad2b3dd3ae0
-	github.com/fogfish/word2vec/trainer v0.0.0-20240222201857-2ad2b3dd3ae0
+	github.com/fogfish/word2vec v0.0.0-20240225155258-5a869a46f03b
 	github.com/kshard/fvecs v0.0.1
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/viper v1.18.2
