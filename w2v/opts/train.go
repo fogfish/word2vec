@@ -42,13 +42,13 @@ var trainCmd = &cobra.Command{
 	Use:   "train",
 	Short: "train word2vec model",
 	Long: `
-Train word2vec model from own corpus. The training process requires:
+Train word2vec model from text corpus. The training process requires:
 * text corpus on target language
 * stop words, obtain from https://github.com/stopwords-iso
 
 Configure training process through config file:
 
-  w2v train config > wap-en.yaml
+  w2v train config > config.yaml
 
 The default params gives sufficient results but feel free to tune them.
 
@@ -60,8 +60,8 @@ Consider naming of the model after parameters used for training:
 * algorithm H. softmax "h1", N. Sampling "h0"
 	`,
 	Example: `
-cmd train -C wap-en.yaml \
-  -o wap-v300w5e10s1h010-en.bin \
+cmd train -C config.yaml \
+  -o wap-v300_w5_e10_s1_h010-en.bin \
   -f ../doc/leo-tolstoy-war-and-peace-en.txt
 	`,
 	RunE: train,

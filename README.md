@@ -12,18 +12,20 @@
     <a href="https://pkg.go.dev/github.com/fogfish/word2vec">
       <img src="https://pkg.go.dev/badge/github.com/fogfish/word2vec" />
     </a>
-    <!-- Build Status  -->
+    <!-- Build Status
     <a href="https://github.com/fogfish/word2vec/actions/">
       <img src="https://github.com/fogfish/word2vec/workflows/test/badge.svg" />
     </a>
+    -->
     <!-- GitHub -->
     <a href="http://github.com/fogfish/word2vec">
       <img src="https://img.shields.io/github/last-commit/fogfish/word2vec.svg" />
     </a>
-    <!-- Coverage -->
+    <!-- Coverage
     <a href="https://coveralls.io/github/fogfish/word2vec?branch=main">
       <img src="https://coveralls.io/repos/github/fogfish/word2vec/badge.svg?branch=main" />
     </a>
+    -->
     <!-- Go Card -->
     <a href="https://goreportcard.com/report/github.com/fogfish/word2vec">
       <img src="https://goreportcard.com/badge/github.com/fogfish/word2vec" />
@@ -33,13 +35,45 @@
 
 --- 
 
-The library enables [word2vec](https://en.wikipedia.org/wiki/Word2vec) algorithm for Golang using native runtime (no servers, no Python, etc). This Golang module implements CGO bridge towards Max Fomichev's [word2vec C++ library](https://github.com/maxoodf/word2vec).
+The library implements the [word2vec](https://en.wikipedia.org/wiki/Word2vec) algorithm for Golang, leveraging the native runtime without relying on external servers or Python dependencies. This Golang module uses a CGO bridge to integrate Max Fomichev's [word2vec C++ library](https://github.com/maxoodf/word2vec).
+
+
+## Inspirations
+
+Despite the availability of commercial and open-source LLMs, word2vec and its derivatives remain prevalent in building niche applications, particularly when dealing with private datasets. Python, along with the `gensim` library, is widely adopted as the quickest means to explore the model for production-grade workloads. Gensim is optimized for performance through the use of C, BLAS, and memory-mapping. However, if your application demands even greater speed, such as performing 94K embeddings calculations per second on a single core, native development becomes the optimal solution.
+
+Our objective is to provide a solution that allows the execution of the Word2Vec model natively within a Golang application, eliminating the need to wrap `gensim` as a sidecar.
+
+Evaluating existing Golang implementations led us to the promising options. However, performance constraints on the UMBC corpus sparked a pursuit of native C integration. We birthed this library after Max Fomichev's [C++ implementation](https://github.com/maxoodf/word2vec) as prominent cross platform solution.
+
+Read more in the blog post [Blazing Fast Text Embedding With Word2Vec in Golang to Power Extensibility of Large Language Models (LLMs)](https://medium.com/@dmkolesnikov/blazing-fast-text-embedding-calculation-with-word2vec-in-golang-to-power-extensibility-of-large-ed05625dea62)
+
+- [Inspirations](#inspirations)
+- [Getting started](#getting-started)
+  - [Pre-requisites](#pre-requisites)
+- [Usage Command line utility](#usage-command-line-utility)
+  - [Training](#training)
+  - [Embeddings](#embeddings)
+  - [Lookup nearest](#lookup-nearest)
+- [Usage Golang module](#usage-golang-module)
+  - [Embeddings](#embeddings-1)
+  - [Lookup nearest](#lookup-nearest-1)
+- [How To Contribute](#how-to-contribute)
+  - [commit message](#commit-message)
+  - [bugs](#bugs)
+- [License](#license)
+- [References](#references)
+
 
 ## Getting started
 
-### Building the C++ library
+The project offers a solution as both a Golang module and a simple command-line application. Use the command-line tool to train word2vec models and the Golang module to compute embeddings and find similar words within your application. 
 
-Use C++11 compatible compiler and cmake 3.1 to build the library. It is essential step before going further.
+### Pre-requisites
+
+A dynamically linked library is required for the CGO bridge to integrate with Max Fomichev's word2vec C++ library. Ensure that the necessary C++ libraries are installed and properly configured on your system to use this functionality.
+
+To build the required dynamically linked library, use a C++11 compatible compiler and CMake 3.1 or higher. This step is essential before proceeding with the installation and usage of the Golang module.
 
 ```bash
 mkdir _build && cd _build
@@ -49,36 +83,87 @@ make
 cp ../libw2v/lib/libw2v.dylib /usr/local/lib/libw2v.dylib
 ```
 
-**Note**: the project does not distribute library binaries, it is upcoming feature. You have to build binaries by yourself for your target runtime or [raise an issue](https://github.com/fogfish/word2vec/issues) if any help is needed.
+**Note**: The project does not currently distribute library binaries, though this feature is planned for a future version. You will need to build the binaries yourself for your target runtime. If you need assistance, please [raise an issue](https://github.com/fogfish/word2vec/issues).
 
-### Training the model
 
-The trained model is required before moving on. Either use original Max Fomichev's [word2vec C++ utility](https://github.com/maxoodf/word2vec) or Golang's frond-end supplied by this project:
+## Usage Command line utility
+
+You can install application from source code but it requires [Golang](https://go.dev/) to be installed.
 
 ```bash
 go install github.com/fogfish/word2vec/w2v@latest
 ```
 
-In following examples, ["War and Peace" by Leo Tolstoy](./doc/leo-tolstoy-war-and-peace-en.txt) is used for training. We have also used [stop words](https://github.com/stopwords-iso/stopwords-en) to increase accuracy.
+### Training
 
-Let's start training with defining the config file:
+The library uses memory-mapped files, enabling extremely fast sequential reading and writing. However, this approach means that the model file format is not compatible with other libraries. Therefore,it is absolutely necessary to train the model using this library if you plan to utilize its functionality.
 
+To start training, begin by configuring the model with the desired parameters: 
+
+```bash
+w2v train config > config.yaml
 ```
-w2v train config > wap-en.yaml
 
-w2v train -C wap-en.yaml \
-  -o wap-v300w5e5s1h005-en.bin \
+The default arguments provide satisfactory results for most text corpora:
+* word vector dimension 300
+* context window 5 words
+* 5 training epoch with 0.05 learning rate
+* skip-gram architecture
+* negative sampling 5
+
+See the article [Word2Vec: Optimal hyperparameters and their impact on natural language processing downstream tasks](https://www.degruyter.com/document/doi/10.1515/comp-2022-0236/html?lang=en) for consideration about training options.
+
+The repository contains the book ["War and Peace"](./doc/leo-tolstoy-war-and-peace-en.txt) by Leo Tolstoy. We have also used [stop words](https://github.com/stopwords-iso/stopwords-en) to increase accuracy.
+
+```bash
+w2v train -C config.yaml \
+  -o wap-v300_w5_e5_s1_h005-en.bin \
   -f ../doc/leo-tolstoy-war-and-peace-en.txt
 ```
 
-Name the output model after parameters used for training: `v` vector size, `w` nearby words window, `e` training epoch, architecture	skip-gram `s1` or CBoW `s0`, algorithm	H. softmax `h1`, N. Sampling `h0`.
+We recommend naming the output model based on the parameters used during training. Use the following format for naming:
+* `v` for vector size
+* `w` for context window size
+* `e` for number of training epochs
+* `s1` for skip-gram architecture or `s0` for CBOW
+* `h1` for hierarchical softmax or `h0` for negative sampling following with size digits
+For example, a model trained with a vector size of 300, a context window of 5, 10 epochs, using the skip-gram architecture and negative sampling could be named `v300_w5_e10_s1_h1.bin`.
 
-The default arguments gives sufficient results, see the article [Word2Vec: Optimal hyperparameters and their impact on natural language processing downstream tasks](https://www.degruyter.com/document/doi/10.1515/comp-2022-0236/html?lang=en) for consideration about training options.
 
+### Embeddings
 
-### Using word2vec
+Calculate embeddings for either a single word or a bag of words. Create a file where each line contains either a single word or a paragraph. The utility will then output a text document where each line contains the corresponding vector for the given text.
 
-The latest version of the library is available at its `main` branch. All development, including new features and bug fixes, take place on the `main` branch using forking and pull requests as described in contribution guidelines. The stable version is available via Golang modules.
+```bash
+echo "
+alexander
+emperor
+king
+tsar
+the emperor alexander
+" > bow.txt
+```
+
+```bash
+w2v embedding \
+  -m wap-v300_w5_e5_s1_h005-en.bin \
+  bow.txt
+```
+
+### Lookup nearest
+
+The word2vec model allows users to find words that are most similar to a given word based on their vector representations. By calculating the similarity between word vectors, the model identifies and retrieves words that are closest in meaning or context to the input word. 
+
+```bash
+w2v lookup \
+  -m wap-v300_w5_e5_s1_h005-en.bin \
+  -k 10 \
+  alexander
+```
+
+## Usage Golang module
+
+The latest version of the module is available at `main` branch. All development, including new features and bug fixes, take place on the `main` branch using forking and pull requests as described in contribution guidelines. The stable version is available via Golang modules.
 
 Use `go get` to retrieve the library and add it as dependency to your application.
 
@@ -86,53 +171,42 @@ Use `go get` to retrieve the library and add it as dependency to your applicatio
 go get -u github.com/fogfish/word2vec
 ```
 
-The example below shows the usage patterns for the library
-
-```go
-import "github.com/fogfish/word2vec"
-
-// 1. Load model
-w2v, err := word2vec.Load("wap-v300w5e10s1h010-en.bin", 300)
-
-seq := make([]word2vec.Nearest, 30)
-w2v.Lookup("alexander", seq)
-```
-
-See [the example](./cmd/opts/lookup.go) or try it our via command line
-
-```bash
-w2v lookup \
-  -m wap-v300w5e5s1h005-en.bin \
-  -k 30 \
-  alexander
-```
-
-
 ### Embeddings
 
-Calculate embedding for document
+Calculate embeddings for either a single word or a bag of words.
 
 ```go
 import "github.com/fogfish/word2vec"
 
 // 1. Load model
-w2v, err := word2vec.Load("wap-v300w5e10s1h010-en.bin", 300)
+w2v, err := word2vec.Load("wap-v300_w5_e5_s1_h005-en.bin", 300)
 
 // 2. Allocated the memory for vector
 vec := make([]float32, 300)
 
 // 3. Calculate embeddings for the document
-doc := "braunau was the headquarters of the commander-in-chief"
+doc := "the emperor alexander"
 err = w2v.Embedding(doc, vec)
 ```
 
 See [the example](./cmd/opts/embedding.go) or try it our via command line
 
-``` bash
-w2v embedding \
-  -m wap-v300w5e5s1h005-en.bin \
-  ../doc/leo-tolstoy-war-and-peace-en.txt
+
+### Lookup nearest
+
+Find words that are most similar to a given word based on their vector representations.
+
+```go
+import "github.com/fogfish/word2vec"
+
+// 1. Load model
+w2v, err := word2vec.Load("wap-v300_w5_e5_s1_h005-en.bin", 300)
+
+seq := make([]word2vec.Nearest, 30)
+w2v.Lookup("alexander", seq)
 ```
+
+See [the example](./cmd/opts/lookup.go)
 
 
 ## How To Contribute
