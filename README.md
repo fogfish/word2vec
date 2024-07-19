@@ -48,6 +48,9 @@ Evaluating existing Golang implementations led us to the promising options. Howe
 
 Read more in the blog post [Blazing Fast Text Embedding With Word2Vec in Golang to Power Extensibility of Large Language Models (LLMs)](https://medium.com/@dmkolesnikov/blazing-fast-text-embedding-calculation-with-word2vec-in-golang-to-power-extensibility-of-large-ed05625dea62)
 
+
+## Getting started
+
 - [Inspirations](#inspirations)
 - [Getting started](#getting-started)
   - [Pre-requisites](#pre-requisites)
@@ -64,8 +67,6 @@ Read more in the blog post [Blazing Fast Text Embedding With Word2Vec in Golang 
 - [License](#license)
 - [References](#references)
 
-
-## Getting started
 
 The project offers a solution as both a Golang module and a simple command-line application. Use the command-line tool to train word2vec models and the Golang module to compute embeddings and find similar words within your application. 
 
