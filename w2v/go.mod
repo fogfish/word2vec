@@ -3,15 +3,12 @@ module github.com/fogfish/word2vec/w2v
 go 1.21.3
 
 require (
-	github.com/fogfish/hnsw v0.0.0-20240206202813-138966e55d58
 	github.com/fogfish/word2vec v0.0.0-20240225155258-5a869a46f03b
-	github.com/kshard/fvecs v0.0.1
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/viper v1.18.2
 )
 
 require (
-	github.com/fogfish/golem/pure v0.10.1 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
