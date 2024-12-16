@@ -20,4 +20,4 @@ jobs:
           submodule_update: OFF
           run_tests: OFF
           cmake_args: -DCMAKE_BUILD_TYPE=Release ./libw2v
-          create_package: ON
+          create_package: OFF
