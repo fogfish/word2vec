@@ -24,7 +24,6 @@ jobs:
 
       - uses: softprops/action-gh-release@v2.2.0
         with:
-          with:
-            tag_name: v0.0.0
-            files: |
-              libw2v/lib/libw2v.a
+          name: v0.0.0
+          files: |
+            libw2v/lib/libw2v.a
