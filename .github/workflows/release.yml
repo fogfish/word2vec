@@ -14,10 +14,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-    - name: build
-      uses: nicledomaS/cmake_build_action@v1.4
-      with:
-        submodule_update: OFF
-        run_tests: OFF
-        cmake_args: -DCMAKE_BUILD_TYPE=Release ./libw2v
-        create_package: ON
+      - name: build
+        uses: nicledomaS/cmake_build_action@v1.4
+        with:
+          submodule_update: OFF
+          run_tests: OFF
+          cmake_args: -DCMAKE_BUILD_TYPE=Release ./libw2v
+          create_package: ON
