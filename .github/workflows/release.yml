@@ -21,3 +21,8 @@ jobs:
           run_tests: OFF
           cmake_args: -DCMAKE_BUILD_TYPE=Release ./libw2v
           create_package: OFF
+
+      - uses: actions/upload-artifact@v2
+        with:
+          path: libw2v/lib/libw2v.a
+          name: libw2v.a
