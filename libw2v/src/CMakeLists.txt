@@ -1,5 +1,5 @@
 project (w2v)
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.10)
 
 set (PROJECT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -37,7 +37,7 @@ set(PRJ_SRCS
         ${ADD_SRCS}
         )
 
-add_library(${PROJECT_NAME} SHARED ${PRJ_SRCS})
+add_library(${PROJECT_NAME} STATIC ${PRJ_SRCS})
 target_link_libraries(${PROJECT_NAME} ${LIBS})
 
 install(TARGETS ${PROJECT_NAME} DESTINATION lib)

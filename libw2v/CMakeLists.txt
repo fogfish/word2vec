@@ -1,5 +1,5 @@
 project (w2v)
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.10)
  
 set(PROJECT_ROOT_DIR ${CMAKE_SOURCE_DIR})
 set(LIBRARY_OUTPUT_PATH ${PROJECT_ROOT_DIR}/lib)
