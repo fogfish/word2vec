@@ -12,12 +12,16 @@ jobs:
   release:
     permissions: write-all
     runs-on: ubuntu-latest
+    matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
     steps:
       - uses: actions/checkout@v4
 
       - name: build
         uses: fogfish/cmake_build_action@master
         with:
+          config: ${{ matrix.configs }}
           submodule_update: OFF
           run_tests: OFF
           cmake_args: -DCMAKE_BUILD_TYPE=Release ./libw2v
@@ -28,7 +32,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: libw2v/lib/libw2v.a
-          asset_name: libw2v.a
+          asset_name: libw2v.${{ matrix.os }}.a
           tag: v0.0.0
           overwrite: true
           body: "This is my release text"
