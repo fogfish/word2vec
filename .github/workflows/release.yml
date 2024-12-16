@@ -1,12 +1,11 @@
 ##
-## Release static library
+## release static library
 ##
 name: release
 on:
-  pull_request:
-    types:
-      - opened
-      - synchronize
+  push:
+    tags:
+      - '*'
 
 jobs:
   release:
@@ -33,8 +32,6 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: libw2v/build/*.tar.gz
-          # asset_name: libw2v.${{ matrix.os }}.a
-          tag: v0.0.0
+          tag: ${{ github.ref }}
           overwrite: true
           file_glob: true
-
