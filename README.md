@@ -81,7 +81,6 @@ mkdir _build && cd _build
 brew install cmake
 cmake -DCMAKE_BUILD_TYPE=Release ../libw2v
 make
-cp ../libw2v/lib/libw2v.dylib /usr/local/lib/libw2v.dylib
 ```
 
 **Note**: The static linked libraries are distributed as binary, download them from [releases](https://github.com/fogfish/word2vec/releases) and extract it to `libw2v` dir.
