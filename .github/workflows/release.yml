@@ -11,8 +11,9 @@ on:
 jobs:
   release:
     permissions: write-all
-    runs-on: ubuntu-latest
-    matrix:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
@@ -35,5 +36,4 @@ jobs:
           asset_name: libw2v.${{ matrix.os }}.a
           tag: v0.0.0
           overwrite: true
-          body: "This is my release text"
 
