@@ -1,5 +1,5 @@
-project (w2v)
 cmake_minimum_required(VERSION 3.10)
+project (w2v)
 
 set (PROJECT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
