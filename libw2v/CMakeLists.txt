@@ -28,11 +28,14 @@ endif()
 
 add_subdirectory(src)
 
+include(CPack)
 set(CPACK_SOURCE_GENERATOR "TGZ")
+set(CPACK_PACKAGE_VERSION_MAJOR "0")
+set(CPACK_PACKAGE_VERSION_MINOR "0")
+set(CPACK_PACKAGE_VERSION_PATCH "0")
 set(CPACK_SOURCE_IGNORE_FILES
   \\.git/
   build/
   ".*~$"
 )
 set(CPACK_VERBATIM_VARIABLES YES)
-include(CPack)
