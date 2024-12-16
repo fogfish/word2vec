@@ -22,9 +22,9 @@ jobs:
           cmake_args: -DCMAKE_BUILD_TYPE=Release ./libw2v
           create_package: OFF
 
-      - uses: softprops/action-gh-release@v2.2.0
+      - uses: Roang-zero1/github-upload-release-artifacts-action@v2
         with:
-          name: v0.0.0
-          tag_name: v0.0.0
-          files: |
-            libw2v/lib/libw2v.a
+          created_tag: v0.0.0
+          args: "libw2v/lib/libw2v.a"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
