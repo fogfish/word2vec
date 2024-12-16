@@ -11,10 +11,10 @@ on:
 jobs:
   release:
     permissions: write-all
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-latest
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu, macos]
 
     steps:
       - uses: actions/checkout@v4
@@ -26,7 +26,7 @@ jobs:
           submodule_update: OFF
           run_tests: OFF
           cmake_args: -DCMAKE_BUILD_TYPE=Release ./libw2v
-          create_package: OFF
+          create_package: ON
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
