@@ -22,9 +22,13 @@ jobs:
           cmake_args: -DCMAKE_BUILD_TYPE=Release ./libw2v
           create_package: OFF
 
-      - uses: Roang-zero1/github-upload-release-artifacts-action@v2
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
         with:
-          created_tag: v0.0.0
-          args: "libw2v/lib/libw2v.a"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: libw2v/lib/libw2v.a
+          asset_name: libw2v.a
+          tag: v0.0.0
+          overwrite: true
+          body: "This is my release text"
+
