@@ -36,4 +36,5 @@ jobs:
           # asset_name: libw2v.${{ matrix.os }}.a
           tag: v0.0.0
           overwrite: true
+          file_glob: true
 
