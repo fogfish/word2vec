@@ -72,9 +72,9 @@ The project offers a solution as both a Golang module and a simple command-line 
 
 ### Pre-requisites
 
-A dynamically linked library is required for the CGO bridge to integrate with Max Fomichev's word2vec C++ library. Ensure that the necessary C++ libraries are installed and properly configured on your system to use this functionality.
+A static linked library is required for the CGO bridge to integrate with Max Fomichev's word2vec C++ library. Ensure that the necessary C++ libraries are installed and properly configured on your system to use this functionality.
 
-To build the required dynamically linked library, use a C++11 compatible compiler and CMake 3.1 or higher. This step is essential before proceeding with the installation and usage of the Golang module.
+To build the required static linked library, use a C++11 compatible compiler and CMake 3.10 or higher. This step is essential before proceeding with the installation and usage of the Golang module.
 
 ```bash
 mkdir _build && cd _build
@@ -84,7 +84,7 @@ make
 cp ../libw2v/lib/libw2v.dylib /usr/local/lib/libw2v.dylib
 ```
 
-**Note**: The project does not currently distribute library binaries, though this feature is planned for a future version. You will need to build the binaries yourself for your target runtime. If you need assistance, please [raise an issue](https://github.com/fogfish/word2vec/issues).
+**Note**: The static linked libraries are distributed as binary, download them from [releases](https://github.com/fogfish/word2vec/releases) and extract it to `libw2v` dir.
 
 
 ## Usage Command line utility
@@ -170,6 +170,31 @@ Use `go get` to retrieve the library and add it as dependency to your applicatio
 
 ```bash
 go get -u github.com/fogfish/word2vec
+```
+
+However, the availability of static library for the target platform (linux, darwin) is the primary requirement. There are two options finishing the installation the module.
+
+**Option 1: build the library (recommended)**
+
+```bash
+go get -u github.com/fogfish/word2vec
+
+git clone --depth=1 --branch=main https://github.com/fogfish/word2vec word2vec
+cd word2vec && cmake -DCMAKE_BUILD_TYPE=Release libw2v && make && cd ..
+go mod edit -replace github.com/fogfish/word2vec=./word2vec
+```
+
+**Option 2: using the pre-build library**
+
+```bash
+go get -u github.com/fogfish/word2vec
+
+git clone --depth=1 --branch=main https://github.com/fogfish/word2vec word2vec
+cd word2vec/libw2v
+curl -L -O https://github.com/fogfish/word2vec/releases/download/v0.0.0/w2v-0.0.0-Darwin.tar.gz
+tar -zxf w2v-0.0.0-Darwin.tar.gz --strip-components=1
+cd ../..
+go mod edit -replace github.com/fogfish/word2vec=./word2vec
 ```
 
 ### Embeddings

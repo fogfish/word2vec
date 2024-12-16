@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <cstring>
 #include <stdexcept>
 
 class H
