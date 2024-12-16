@@ -22,7 +22,9 @@ jobs:
           cmake_args: -DCMAKE_BUILD_TYPE=Release ./libw2v
           create_package: OFF
 
-      - uses: actions/upload-artifact@v4
+      - uses: softprops/action-gh-release@v2.2.0
         with:
-          path: libw2v/lib/libw2v.a
-          name: libw2v.a
+          with:
+            tag_name: v0.0.0
+            files: |
+              libw2v/lib/libw2v.a
