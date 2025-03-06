@@ -382,7 +382,7 @@ namespace w2v
     //
     //
 
-    word2vec_t::word2vec_t(const std::unique_ptr<w2vModel_t> &_model) : vector_t(_model->vectorSize()){};
+    word2vec_t::word2vec_t(const std::unique_ptr<w2vModel_t> &_model) : vector_t(_model->vectorSize()){}
 
     word2vec_t::word2vec_t(const std::unique_ptr<w2vModel_t> &_model, const std::string &_word) : vector_t(_model->vectorSize())
     {
