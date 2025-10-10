@@ -249,7 +249,7 @@ struct nearest_t NearestVector(void *fd, float *vector, size_t vecSize, size_t k
   try
   {
     auto h = reinterpret_cast<H *>(fd);
-    w2v::doc2vec_t vec(vector, vector + vecSize);
+    w2v::vector_t vec(std::vector<float>(vector, vector + vecSize));
 
     std::vector<std::pair<std::string, float>> nearests;
     h->model->nearest(vec, nearests, k);
