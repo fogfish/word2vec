@@ -7,7 +7,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_ROOT_DIR}/lib)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb")
-set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -march=native -funroll-loops -ftree-vectorize -DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math -march=native -funroll-loops -ftree-vectorize -DNDEBUG")
 
 set(PROJECT_INCLUDE_DIR ${PROJECT_ROOT_DIR}/include)
 
