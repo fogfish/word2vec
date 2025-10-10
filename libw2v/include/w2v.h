@@ -42,6 +42,7 @@ extern "C"
   };
 
   struct nearest_t Lookup(void *fd, const char *query, size_t k);
+  struct nearest_t NearestVector(void *fd, float *vector, size_t vecSize, size_t k);
 #ifdef __cplusplus
 }
 #endif
