@@ -132,3 +132,28 @@ func (w2v Model) Lookup(query string, seq []Nearest) error {
 
 	return nil
 }
+
+// NearestVector finds nearest words from the model given a pre-computed vector
+func (w2v Model) NearestVector(vector []float32, seq []Nearest) error {
+	k := len(seq)
+	bag := (nearest_t)(C.NearestVector(w2v.h, (*C.float)(&vector[0]), C.ulong(len(vector)), C.ulong(k)))
+
+	if bag.seq == nil || bag.buf == nil {
+		return errors.New("invalid vector")
+	}
+
+	seqd := unsafe.Slice((*float32)(bag.seq), k)
+	seqw := unsafe.Slice((*C.char)(bag.buf), bag.len)
+
+	p := 0
+	for i := 0; i < k; i++ {
+		seq[i].Distance = seqd[i]
+		seq[i].Word = C.GoString(&seqw[p])
+		p += len(seq[i].Word) + 1
+	}
+
+	C.free(unsafe.Pointer(bag.seq))
+	C.free(unsafe.Pointer(bag.buf))
+
+	return nil
+}

@@ -243,3 +243,43 @@ struct nearest_t Lookup(void *fd, const char *query, size_t k)
     return nearest_t{0, 0, 0};
   }
 }
+
+struct nearest_t NearestVector(void *fd, float *vector, size_t vecSize, size_t k)
+{
+  try
+  {
+    auto h = reinterpret_cast<H *>(fd);
+    w2v::vector_t vec(std::vector<float>(vector, vector + vecSize));
+
+    std::vector<std::pair<std::string, float>> nearests;
+    h->model->nearest(vec, nearests, k);
+
+    float *seqd = (float *)malloc(sizeof(float) * k);
+
+    size_t len = 0;
+    for (auto i = size_t(0); i < k; i++)
+    {
+      len += nearests[i].first.length() + 1;
+    }
+    char *seqw = (char *)malloc(len);
+
+    size_t p = 0;
+
+    for (auto i = size_t(0); i < k; i++)
+    {
+      *(seqd + i) = nearests[i].second;
+
+      strcpy(seqw + p, nearests[i].first.c_str());
+
+      p += nearests[i].first.length();
+      *(seqw + p) = '\0';
+
+      p++;
+    }
+    return nearest_t{seqd, len, seqw};
+  }
+  catch (const std::exception &e)
+  {
+    return nearest_t{0, 0, 0};
+  }
+}
